@@ -5,4 +5,7 @@ Metrics/LineLength:
   Max: 140
 
 Style/FrozenStringLiteralComment:
-    Enabled: false
+  Enabled: false
+
+Style/EmptyLinesAroundBlockBody:
+  Enabled: false
