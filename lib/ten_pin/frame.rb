@@ -14,7 +14,11 @@ module TenPin
     end
 
     def roll(pins_knocked)
-      @rolls << pins_knocked
+      @rolls << pins_knocked unless scored?
+    end
+
+    def scored?
+      return true if @rolls.size == 3
     end
   end
 end
