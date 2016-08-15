@@ -5,6 +5,8 @@ module TenPin
   class Frame
     attr_accessor :rolls
 
+    MAX_FRAME_ROLLS = 3
+
     def initialize
       @rolls = []
     end
@@ -18,7 +20,7 @@ module TenPin
     end
 
     def scored?
-      return true if @rolls.size == 3
+      return true if @rolls.size == MAX_FRAME_ROLLS
     end
   end
 end

@@ -19,6 +19,9 @@ describe TenPin::Frame do
     strike + first_non_strike_non_spare_roll +
       second_non_strike_non_spare_roll
   end
+  let(:spare_roll) { strike - random_non_zero_roll }
+  let(:spare_score) { 10 }
+  let(:spare_plus_bonus_roll_score) { spare_score + random_non_zero_roll }
 
   describe '#score' do
 
@@ -73,25 +76,39 @@ describe TenPin::Frame do
         it { expect(new_frame.score).to eq score_plus_two_random_non_zero_roll }
       end
 
-      context 'when the bonus rolls have been scored' do
+      context 'when the frame has been scored' do
         before do
           new_frame.roll first_non_strike_non_spare_roll
           new_frame.roll second_non_strike_non_spare_roll
         end
 
-        it 'does not score any other rolls given' do
+        it 'does not register any more rolls to the score' do
           new_frame.roll random_non_zero_roll
           expect(new_frame.score).to eq score_plus_two_random_non_zero_roll
         end
       end
     end
 
-    # context 'when a strike is rolled and 1 bonus roll scored' do
-    # end
-    # context 'when a strike is rolled and 2 bonus roll scored' do
-    # end
-    # context 'when you get a spare' do
-    # end
+    context 'when you get a spare' do
+      before do
+        new_frame.roll random_non_zero_roll
+        new_frame.roll spare_roll
+      end
+
+      it { expect(new_frame.score).to eq spare_score }
+
+      context 'when the frame has been scored' do
+        before { new_frame.roll random_non_zero_roll }
+
+        it { expect(new_frame.score).to eq spare_plus_bonus_roll_score }
+
+        it 'does not register any more rolls to the score' do
+          new_frame.roll random_non_zero_non_strike_roll
+          expect(new_frame.score).to eq spare_plus_bonus_roll_score
+        end
+      end
+    end
+
     # context 'when an invalid roll happens (roll < 0 or > 10)' do
     # end
   end
