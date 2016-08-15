@@ -22,6 +22,7 @@ describe TenPin::Frame do
   let(:spare_roll) { strike - random_non_zero_roll }
   let(:spare_score) { 10 }
   let(:spare_plus_bonus_roll_score) { spare_score + random_non_zero_roll }
+  let(:invalid_roll) { [-23, 12].sample }
 
   describe '#score' do
 
@@ -109,7 +110,12 @@ describe TenPin::Frame do
       end
     end
 
-    # context 'when an invalid roll happens (roll < 0 or > 10)' do
-    # end
+    context 'when an invalid roll happens (roll < 0 or > 10)' do
+      before { new_frame.roll invalid_roll }
+
+      it 'does not register the invalid roll' do
+        expect(new_frame.score).to eq 0
+      end
+    end
   end
 end
