@@ -6,8 +6,9 @@ module TenPin
     attr_accessor :rolls
 
     MAX_FRAME_ROLLS = 3
-    LOWEST_POSS_ROLL = 0
-    HIGHEST_POSS_ROLL = 10
+    LOWEST_FRAME_SCORE = 0
+    MAX_FRAME_SCORE = 10
+    MAX_NON_X_ROLLS = 2
 
     def initialize
       @rolls = []
@@ -22,12 +23,16 @@ module TenPin
     end
 
     def scored?
+      return true if score < MAX_FRAME_SCORE && @rolls.size == MAX_NON_X_ROLLS
       return true if @rolls.size == MAX_FRAME_ROLLS
     end
 
+    def valid_roll?(roll)
+      return true unless roll > MAX_FRAME_SCORE || roll < LOWEST_FRAME_SCORE
+    end
+
     def invalid_roll?(roll)
-      return false unless roll > HIGHEST_POSS_ROLL || roll < LOWEST_POSS_ROLL
-      true
+      !valid_roll? roll
     end
   end
 end

@@ -54,6 +54,11 @@ describe TenPin::Frame do
         end
 
         it { expect(new_frame.score).to eq non_strike_non_spare_result }
+
+        it 'does not register any more rolls' do
+          new_frame.roll random_non_zero_roll
+          expect(new_frame.score).to eq non_strike_non_spare_result
+        end
       end
     end
 
@@ -77,7 +82,7 @@ describe TenPin::Frame do
         it { expect(new_frame.score).to eq score_plus_two_random_non_zero_roll }
       end
 
-      context 'when the frame has been scored' do
+      context 'when non strike frame has been scored' do
         before do
           new_frame.roll first_non_strike_non_spare_roll
           new_frame.roll second_non_strike_non_spare_roll
