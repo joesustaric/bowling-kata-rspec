@@ -28,11 +28,13 @@ module TenPin
     end
 
     def valid_roll?(roll)
-      return true unless roll > MAX_FRAME_SCORE || roll < LOWEST_FRAME_SCORE
+      roll <= MAX_FRAME_SCORE && roll >= LOWEST_FRAME_SCORE
     end
 
     def invalid_roll?(roll)
       !valid_roll? roll
     end
+
+    private :valid_roll?, :invalid_roll?, :scored?
   end
 end
