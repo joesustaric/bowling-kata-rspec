@@ -145,4 +145,56 @@ describe TenPin::Frame do
       it { expect(new_frame.frame_over?).to eq true }
     end
   end
+
+  describe '#scored?' do
+    context 'when there is a strike' do
+      before { new_frame.roll strike }
+
+      it { expect(new_frame.scored?).to eq false }
+
+      context 'when we have scored 1 bouns roll out of 2' do
+        before { new_frame.roll random_non_zero_roll }
+
+        it { expect(new_frame.scored?).to eq false }
+      end
+
+      context 'when we have scored 2 bouns rolls out of 2' do
+        before do
+          new_frame.roll first_non_strike_non_spare_roll
+          new_frame.roll second_non_strike_non_spare_roll
+        end
+
+        it { expect(new_frame.scored?).to eq true }
+      end
+    end
+
+    context 'when first roll is not a strike' do
+      before { new_frame.roll random_non_zero_non_strike_roll }
+
+      it { expect(new_frame.scored?).to eq false }
+    end
+
+    context 'when there are two rolls and its not a spare' do
+      before do
+        new_frame.roll random_non_zero_non_strike_roll
+        new_frame.roll second_non_strike_non_spare_roll
+      end
+
+      it { expect(new_frame.frame_over?).to eq true }
+    end
+
+    context 'when you get a spare' do
+      before { new_frame.roll 10 - random_non_zero_non_strike_roll }
+
+      it { expect(new_frame.scored?).to eq false }
+
+      context 'when you socre 1 bonus roll' do
+        before do
+          new_frame.roll random_non_zero_roll
+        end
+
+        it { expect(new_frame.frame_over?).to eq true }
+      end
+    end
+  end
 end

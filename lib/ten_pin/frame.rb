@@ -30,6 +30,7 @@ module TenPin
     def scored?
       return true if score < MAX_FRAME_ROLL && @rolls.size == MAX_NON_X_ROLLS
       return true if @rolls.size == MAX_FRAME_ROLLS
+      false
     end
 
     def valid_roll?(roll)
@@ -40,6 +41,6 @@ module TenPin
       !valid_roll? roll
     end
 
-    private :valid_roll?, :invalid_roll?, :scored?
+    private :valid_roll?, :invalid_roll?
   end
 end
