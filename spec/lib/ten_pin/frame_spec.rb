@@ -31,7 +31,6 @@ describe TenPin::Frame do
 
       context 'when you roll a gutter ball' do
         before { new_frame.roll gutter_ball }
-
         it { expect(new_frame.score).to eq 0 }
       end
 
@@ -121,6 +120,29 @@ describe TenPin::Frame do
       it 'does not register the invalid roll' do
         expect(new_frame.score).to eq 0
       end
+    end
+  end
+
+  describe '#frame_over?' do
+    context 'when there is a strike' do
+      before { new_frame.roll strike }
+
+      it { expect(new_frame.frame_over?).to eq true }
+    end
+
+    context 'when first roll is not a strike' do
+      before { new_frame.roll random_non_zero_non_strike_roll }
+
+      it { expect(new_frame.frame_over?).to eq false }
+    end
+
+    context 'when there are two rolls and first is not a strike' do
+      before do
+        new_frame.roll random_non_zero_non_strike_roll
+        new_frame.roll second_non_strike_non_spare_roll
+      end
+
+      it { expect(new_frame.frame_over?).to eq true }
     end
   end
 end
