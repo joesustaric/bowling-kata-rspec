@@ -5,196 +5,57 @@ describe TenPin::Frame do
 
   subject(:new_frame) { TenPin::Frame.new }
 
-  let(:gutter_ball) { 0 }
-  let(:random_non_zero_roll) { (1..10).to_a.sample }
-  let(:random_non_zero_non_strike_roll) { (1..9).to_a.sample }
-  let(:first_non_strike_non_spare_roll) { 2 }
-  let(:second_non_strike_non_spare_roll) { 3 }
-  let(:non_strike_non_spare_result) do
-    first_non_strike_non_spare_roll + second_non_strike_non_spare_roll
-  end
-  let(:strike) { 10 }
-  let(:score_plus_random_non_zero_roll) { strike + random_non_zero_roll }
-  let(:score_plus_two_random_non_zero_roll) do
-    strike + first_non_strike_non_spare_roll +
-      second_non_strike_non_spare_roll
-  end
-  let(:spare_roll) { strike - random_non_zero_roll }
-  let(:spare_score) { 10 }
-  let(:spare_plus_bonus_roll_score) { spare_score + random_non_zero_roll }
-  let(:invalid_roll) { [-23, 12].sample }
+  let(:new_game_score) { 0 }
+  let(:random_non_zero_bowl) { (1..10).to_a.sample }
+  let(:random_invalid_bowl) { [-23, -1, 12, 274, 'Foo'].sample }
+  let(:max_score) { 10 }
+  # let(:gutter_ball) { 0 }
+  # let(:random_non_zero_non_strike_roll) { (1..9).to_a.sample }
+  # let(:first_non_strike_non_spare_roll) { 2 }
+  # let(:second_non_strike_non_spare_roll) { 3 }
+  # let(:non_strike_non_spare_result) do
+  #   first_non_strike_non_spare_roll + second_non_strike_non_spare_roll
+  # end
+  # let(:strike) { 10 }
+  # let(:score_plus_random_non_zero_bowl) { strike + random_non_zero_bowl }
+  # let(:score_plus_two_random_non_zero_bowl) do
+  #   strike + first_non_strike_non_spare_roll +
+  #     second_non_strike_non_spare_roll
+  # end
+  # let(:spare_roll) { strike - random_non_zero_bowl }
+  # let(:spare_score) { 10 }
+  # let(:spare_plus_bonus_roll_score) { spare_score + random_non_zero_bowl }
 
-  describe '#score' do
+  describe '#register_bowl' do
 
-    context 'Given a new frame' do
+    context 'Given a new game' do
       it { expect(new_frame.score).to eq 0 }
 
-      context 'when you roll a gutter ball' do
-        before { new_frame.roll gutter_ball }
-        it { expect(new_frame.score).to eq 0 }
+      context 'when we register a valid bowl' do
+        before { expect(new_frame.register_bowl(random_non_zero_bowl)).to eq true }
+
+        it { expect(new_frame.score).to eq random_non_zero_bowl }
       end
 
-      context 'when we score the first roll' do
-        before { new_frame.roll random_non_zero_roll }
-
-        it { expect(new_frame.score).to eq random_non_zero_roll }
-      end
-
-      context 'when first roll knocks > 0 < 10' do
-        before { new_frame.roll random_non_zero_non_strike_roll }
-
-        it { expect(new_frame.score).to eq random_non_zero_non_strike_roll }
-      end
-
-      context 'when two rolls knock < 10' do
-        before do
-          new_frame.roll first_non_strike_non_spare_roll
-          new_frame.roll second_non_strike_non_spare_roll
-        end
-
-        it { expect(new_frame.score).to eq non_strike_non_spare_result }
-
-        it 'does not register any more rolls' do
-          new_frame.roll random_non_zero_roll
-          expect(new_frame.score).to eq non_strike_non_spare_result
-        end
+      context 'when we register a invalid bowl' do
+        it { expect(new_frame.register_bowl(random_invalid_bowl)).to eq false }
       end
     end
 
-    context 'when strike is rolled' do
-      before { new_frame.roll strike }
+    context 'Given a non zero non strike first bowl' do
+      before { expect(new_frame.register_bowl(random_non_zero_bowl)).to eq true }
 
-      it { expect(new_frame.score).to eq strike }
-
-      context 'when the first bonus is scored' do
-        before { new_frame.roll random_non_zero_roll }
-
-        it { expect(new_frame.score).to eq score_plus_random_non_zero_roll }
-      end
-
-      context 'when the second bonus is scored' do
+      context 'when we try to register a roll that is > 10' do
         before do
-          new_frame.roll first_non_strike_non_spare_roll
-          new_frame.roll second_non_strike_non_spare_roll
+          invalid_bowl = max_score - random_non_zero_bowl + 1
+          expect(new_frame.register_bowl(invalid_bowl)).to eq false
         end
 
-        it { expect(new_frame.score).to eq score_plus_two_random_non_zero_roll }
-      end
-
-      context 'when non strike frame has been scored' do
-        before do
-          new_frame.roll first_non_strike_non_spare_roll
-          new_frame.roll second_non_strike_non_spare_roll
+        it 'does not register the bowl' do
+          expect(new_frame.score).to eq random_non_zero_bowl
         end
-
-        it 'does not register any more rolls to the score' do
-          new_frame.roll random_non_zero_roll
-          expect(new_frame.score).to eq score_plus_two_random_non_zero_roll
-        end
-      end
-    end
-
-    context 'when you get a spare' do
-      before do
-        new_frame.roll random_non_zero_roll
-        new_frame.roll spare_roll
-      end
-
-      it { expect(new_frame.score).to eq spare_score }
-
-      context 'when the frame has been scored' do
-        before { new_frame.roll random_non_zero_roll }
-
-        it { expect(new_frame.score).to eq spare_plus_bonus_roll_score }
-
-        it 'does not register any more rolls to the score' do
-          new_frame.roll random_non_zero_non_strike_roll
-          expect(new_frame.score).to eq spare_plus_bonus_roll_score
-        end
-      end
-    end
-
-    context 'when an invalid roll happens (roll < 0 or > 10)' do
-      before { new_frame.roll invalid_roll }
-
-      it 'does not register the invalid roll' do
-        expect(new_frame.score).to eq 0
       end
     end
   end
 
-  describe '#frame_over?' do
-    context 'when there is a strike' do
-      before { new_frame.roll strike }
-
-      it { expect(new_frame.frame_over?).to eq true }
-    end
-
-    context 'when first roll is not a strike' do
-      before { new_frame.roll random_non_zero_non_strike_roll }
-
-      it { expect(new_frame.frame_over?).to eq false }
-    end
-
-    context 'when there are two rolls and first is not a strike' do
-      before do
-        new_frame.roll random_non_zero_non_strike_roll
-        new_frame.roll second_non_strike_non_spare_roll
-      end
-
-      it { expect(new_frame.frame_over?).to eq true }
-    end
-  end
-
-  describe '#scored?' do
-    context 'when there is a strike' do
-      before { new_frame.roll strike }
-
-      it { expect(new_frame.scored?).to eq false }
-
-      context 'when we have scored 1 bouns roll out of 2' do
-        before { new_frame.roll random_non_zero_roll }
-
-        it { expect(new_frame.scored?).to eq false }
-      end
-
-      context 'when we have scored 2 bouns rolls out of 2' do
-        before do
-          new_frame.roll first_non_strike_non_spare_roll
-          new_frame.roll second_non_strike_non_spare_roll
-        end
-
-        it { expect(new_frame.scored?).to eq true }
-      end
-    end
-
-    context 'when first roll is not a strike' do
-      before { new_frame.roll random_non_zero_non_strike_roll }
-
-      it { expect(new_frame.scored?).to eq false }
-    end
-
-    context 'when there are two rolls and its not a spare' do
-      before do
-        new_frame.roll random_non_zero_non_strike_roll
-        new_frame.roll second_non_strike_non_spare_roll
-      end
-
-      it { expect(new_frame.frame_over?).to eq true }
-    end
-
-    context 'when you get a spare' do
-      before { new_frame.roll 10 - random_non_zero_non_strike_roll }
-
-      it { expect(new_frame.scored?).to eq false }
-
-      context 'when you socre 1 bonus roll' do
-        before do
-          new_frame.roll random_non_zero_roll
-        end
-
-        it { expect(new_frame.frame_over?).to eq true }
-      end
-    end
-  end
 end
