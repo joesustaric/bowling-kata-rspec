@@ -9,14 +9,14 @@ describe TenPin::Frame do
   let(:random_non_zero_bowl) { (1..10).to_a.sample }
   let(:random_invalid_bowl) { [-23, -1, 12, 274, 'Foo'].sample }
   let(:max_score) { 10 }
+  let(:strike) { 10 }
+  let(:random_non_zero_non_strike_roll) { (1..9).to_a.sample }
   # let(:gutter_ball) { 0 }
-  # let(:random_non_zero_non_strike_roll) { (1..9).to_a.sample }
   # let(:first_non_strike_non_spare_roll) { 2 }
   # let(:second_non_strike_non_spare_roll) { 3 }
   # let(:non_strike_non_spare_result) do
   #   first_non_strike_non_spare_roll + second_non_strike_non_spare_roll
   # end
-  # let(:strike) { 10 }
   # let(:score_plus_random_non_zero_bowl) { strike + random_non_zero_bowl }
   # let(:score_plus_two_random_non_zero_bowl) do
   #   strike + first_non_strike_non_spare_roll +
@@ -58,4 +58,31 @@ describe TenPin::Frame do
     end
   end
 
+  describe '#bonus?' do
+
+    context 'Given a new game' do
+      it { expect(new_frame.bonus?).to eq false }
+    end
+
+    context 'Given a strike bowl' do
+      before { new_frame.register_bowl strike }
+
+      it { expect(new_frame.bonus?).to eq true }
+    end
+
+    context 'Given a non strike first bowl' do
+      before { new_frame.register_bowl random_non_zero_non_strike_roll }
+
+      it { expect(new_frame.bonus?).to eq false }
+    end
+
+    context 'Given a spare frame played' do
+      before do
+        new_frame.register_bowl random_non_zero_non_strike_roll
+        new_frame.register_bowl(strike - random_non_zero_non_strike_roll)
+      end
+
+      it { expect(new_frame.bonus?).to eq true }
+    end
+  end
 end
