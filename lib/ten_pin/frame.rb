@@ -3,10 +3,14 @@ module TenPin
   # Class Documentation Comment
   # Need to include a good example of a class documentation.
   class Frame
+    attr_reader :bowls, :bonus_bowls
     MAX_FRAME_SCORE = 10
     MIN_FRAME_SCORE = 0
     STRIKE_INDEX = 0
+    STRIKE_BOWL = 1
     SPARE_BOWLS = 2
+    STRIKE_BONUS_BOWLS = 2
+    SPARE_BONUS_BOWLS = 1
 
     def initialize
       @bowls = []
@@ -14,10 +18,18 @@ module TenPin
     end
 
     def score
-      @bowls.inject(0, :+) + @bonus_bowls.inject(0, :+)
+      frame_score + bonus_score
     end
 
-    def bonus?
+    def frame_score
+      @bowls.inject(0, :+)
+    end
+
+    def bonus_score
+      @bonus_bowls.inject(0, :+)
+    end
+
+    def bonus_mode?
       strike? || spare?
     end
 
@@ -29,7 +41,8 @@ module TenPin
 
     def score_bonus(bowl)
       return false unless bowled_pins_between_zero_and_ten? bowl
-      @bonus_bowls << bowl
+      return false unless bonus_mode?
+      @bonus_bowls << bowl unless bonus_scored?
       true
     end
 
@@ -38,8 +51,13 @@ module TenPin
     end
 
     def valid_frame_bowl?(bowl)
-      available_score_left = MAX_FRAME_SCORE - score
-      bowl <= available_score_left && bowled_pins_between_zero_and_ten?(bowl)
+      bowl <= available_score_left &&
+        bowled_pins_between_zero_and_ten?(bowl) &&
+        @bowls.size < 2
+    end
+
+    def available_score_left
+      MAX_FRAME_SCORE - score
     end
 
     def bowled_pins_between_zero_and_ten?(bowl)
@@ -47,34 +65,32 @@ module TenPin
     end
 
     def strike?
-      @bowls[STRIKE_INDEX] == MAX_FRAME_SCORE
+      @bowls.size == STRIKE_BOWL && max_frame_scored?
     end
 
     def spare?
-      @bowls.size == SPARE_BOWLS && score == MAX_FRAME_SCORE
+      @bowls.size == SPARE_BOWLS && max_frame_scored?
     end
-    #
-    # def frame_over?
-    #   return true if score == MAX_FRAME_ROLL && @rolls.size == STRIKE_ROLL
-    #   return true if @rolls.size == MAX_NON_X_ROLLS
-    #   false
-    # end
-    #
-    # def scored?
-    #   return true if score < MAX_FRAME_ROLL && @rolls.size == MAX_NON_X_ROLLS
-    #   return true if @rolls.size == MAX_FRAME_ROLLS
-    #   false
-    # end
-    #
-    # def valid_roll?(roll)
-    #   roll <= MAX_FRAME_ROLL && roll >= LOWEST_FRAME_SCORE
-    # end
-    #
-    # def invalid_roll?(roll)
-    #   !valid_roll? roll
-    # end
-    #
-    private :valid_bowl?, :bowled_pins_between_zero_and_ten?, :strike?
-    private :valid_frame_bowl?
+
+    def max_frame_scored?
+      frame_score == MAX_FRAME_SCORE
+    end
+
+    def bonus_scored?
+      strike_bonus_scored? || spare_bonus_scored?
+    end
+
+    def strike_bonus_scored?
+      strike? && @bonus_bowls.size == STRIKE_BONUS_BOWLS
+    end
+
+    def spare_bonus_scored?
+      spare? && @bonus_bowls.size == SPARE_BONUS_BOWLS
+    end
+
+    private :valid_bowl?, :bowled_pins_between_zero_and_ten?
+    private :valid_frame_bowl?, :available_score_left, :strike?
+    private :spare_bonus_scored?, :bonus_scored?, :strike_bonus_scored?
+    private :frame_score, :bonus_score
   end
 end

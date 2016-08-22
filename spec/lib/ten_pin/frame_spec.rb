@@ -11,9 +11,10 @@ describe TenPin::Frame do
   let(:max_score) { 10 }
   let(:strike) { 10 }
   let(:random_non_zero_non_strike_roll) { (1..9).to_a.sample }
+  let(:spare_roll) { strike - random_non_zero_non_strike_roll }
+  let(:first_non_strike_non_spare_roll) { 2 }
+  let(:second_non_strike_non_spare_roll) { 3 }
   # let(:gutter_ball) { 0 }
-  # let(:first_non_strike_non_spare_roll) { 2 }
-  # let(:second_non_strike_non_spare_roll) { 3 }
   # let(:non_strike_non_spare_result) do
   #   first_non_strike_non_spare_roll + second_non_strike_non_spare_roll
   # end
@@ -22,14 +23,12 @@ describe TenPin::Frame do
   #   strike + first_non_strike_non_spare_roll +
   #     second_non_strike_non_spare_roll
   # end
-  # let(:spare_roll) { strike - random_non_zero_bowl }
   # let(:spare_score) { 10 }
   # let(:spare_plus_bonus_roll_score) { spare_score + random_non_zero_bowl }
 
   describe '#register_bowl' do
 
     context 'Given a new game' do
-      it { expect(new_frame.score).to eq 0 }
 
       context 'when we register a valid bowl' do
         before { expect(new_frame.register_bowl(random_non_zero_bowl)).to eq true }
@@ -58,31 +57,129 @@ describe TenPin::Frame do
     end
   end
 
-  describe '#bonus?' do
+  describe '#bonus_mode?' do
 
     context 'Given a new game' do
-      it { expect(new_frame.bonus?).to eq false }
+      it { expect(new_frame.bonus_mode?).to eq false }
     end
 
     context 'Given a strike bowl' do
       before { new_frame.register_bowl strike }
 
-      it { expect(new_frame.bonus?).to eq true }
+      it { expect(new_frame.bonus_mode?).to eq true }
     end
 
     context 'Given a non strike first bowl' do
       before { new_frame.register_bowl random_non_zero_non_strike_roll }
 
-      it { expect(new_frame.bonus?).to eq false }
+      it { expect(new_frame.bonus_mode?).to eq false }
     end
 
     context 'Given a spare frame played' do
       before do
         new_frame.register_bowl random_non_zero_non_strike_roll
-        new_frame.register_bowl(strike - random_non_zero_non_strike_roll)
+        new_frame.register_bowl(max_score - random_non_zero_non_strike_roll)
       end
 
-      it { expect(new_frame.bonus?).to eq true }
+      it { expect(new_frame.bonus_mode?).to eq true }
+    end
+  end
+
+  describe '#score' do
+    context 'Given a new frame' do
+      it { expect(new_frame.score).to eq 0 }
+
+      context 'when we roll a valid first roll' do
+        before { new_frame.register_bowl random_non_zero_bowl }
+
+        it { expect(new_frame.score).to eq random_non_zero_bowl }
+      end
+
+      context 'when we roll a strike' do
+        before { new_frame.register_bowl strike }
+
+        it { expect(new_frame.score).to eq strike }
+        it 'does not score any new bowls' do
+          new_frame.register_bowl random_non_zero_bowl
+          expect(new_frame.score).to eq strike
+        end
+      end
+
+      context 'when we roll a spare' do
+        before do
+          new_frame.register_bowl random_non_zero_bowl
+          new_frame.register_bowl(max_score - random_non_zero_bowl)
+        end
+
+        it { expect(new_frame.score).to eq max_score }
+        it 'does not score any new bowls' do
+          new_frame.register_bowl random_non_zero_bowl
+          expect(new_frame.score).to eq strike
+        end
+      end
+
+      context 'when we roll a non spare second bowl' do
+        let(:score) { 9 }
+        before do
+          second_bowl = max_score - random_non_zero_non_strike_roll - 1
+          new_frame.register_bowl random_non_zero_non_strike_roll
+          new_frame.register_bowl second_bowl
+        end
+
+        it { expect(new_frame.score).to eq score }
+
+        it 'does not score any new bowls' do
+          new_frame.register_bowl random_non_zero_bowl
+          expect(new_frame.score).to eq score
+        end
+      end
+    end
+
+    context 'Given a strike frame' do
+      before { new_frame.register_bowl strike }
+
+      context 'when we score 1 bonus bowl' do
+        before { new_frame.score_bonus random_non_zero_bowl }
+
+        it { expect(new_frame.score).to eq(strike + random_non_zero_bowl) }
+      end
+
+      context 'when we score 2 bonus bowls' do
+        before do
+          new_frame.score_bonus random_non_zero_bowl
+          new_frame.score_bonus random_non_zero_bowl
+        end
+
+        it 'score is correct' do
+          score = max_score + (random_non_zero_bowl * 2)
+          expect(new_frame.score).to eq(score)
+        end
+        it 'does not score any more bonus bowls' do
+          new_frame.score_bonus random_non_zero_bowl
+          expect(new_frame.score).to eq(max_score + (random_non_zero_bowl * 2))
+        end
+      end
+    end
+
+    context 'Given a spare frame' do
+      before do
+        new_frame.register_bowl random_non_zero_non_strike_roll
+        new_frame.register_bowl spare_roll
+      end
+
+      context 'when we score 1 bonus bowl' do
+        before { new_frame.score_bonus random_non_zero_bowl }
+
+        it 'score is correct' do
+          score = max_score + random_non_zero_bowl
+          expect(new_frame.score).to eq(score)
+        end
+        it 'does not score any more bonus bowls' do
+          score = max_score + random_non_zero_bowl
+          new_frame.score_bonus random_non_zero_bowl
+          expect(new_frame.score).to eq(score)
+        end
+      end
     end
   end
 end
