@@ -4,6 +4,7 @@ module TenPin
   # Need to include a good example of a class documentation.
   class Frame
     attr_reader :bowls, :bonus_bowls
+
     MAX_FRAME_SCORE = 10
     MIN_FRAME_SCORE = 0
     STRIKE_INDEX = 0
@@ -11,6 +12,7 @@ module TenPin
     SPARE_BOWLS = 2
     STRIKE_BONUS_BOWLS = 2
     SPARE_BONUS_BOWLS = 1
+    MAX_FRAME_BOWLS = 2
 
     def initialize
       @bowls = []
@@ -31,6 +33,16 @@ module TenPin
 
     def bonus_mode?
       strike? || spare?
+    end
+
+    def no_bonus_mode?
+      !bonus_mode?
+    end
+
+    def frame_over?
+      strike_bonus_scored? ||
+        spare_bonus_scored? ||
+        two_bowls_completed_no_bonus?
     end
 
     def register_bowl(bowl)
@@ -70,6 +82,10 @@ module TenPin
 
     def spare?
       @bowls.size == SPARE_BOWLS && max_frame_scored?
+    end
+
+    def two_bowls_completed_no_bonus?
+      @bowls.size == MAX_FRAME_BOWLS && no_bonus_mode?
     end
 
     def max_frame_scored?

@@ -86,6 +86,7 @@ describe TenPin::Frame do
   end
 
   describe '#score' do
+
     context 'Given a new frame' do
       it { expect(new_frame.score).to eq 0 }
 
@@ -204,4 +205,73 @@ describe TenPin::Frame do
     end
 
   end
+
+  describe '#frame_over?' do
+
+    context 'Given a new frame' do
+
+      it { expect(new_frame.frame_over?).to eq false }
+
+      context 'when we bowl a strike' do
+        before { new_frame.register_bowl strike }
+
+        it { expect(new_frame.frame_over?).to eq false }
+      end
+
+      context 'when we score one bonus bowl from a strike frame' do
+        before do
+          new_frame.register_bowl strike
+          new_frame.score_bonus random_non_zero_bowl
+        end
+
+        it { expect(new_frame.frame_over?).to eq false }
+      end
+
+      context 'when we score two bonus bowls from a strike frame' do
+        before do
+          new_frame.register_bowl strike
+          new_frame.score_bonus random_non_zero_bowl
+          new_frame.score_bonus random_non_zero_bowl
+        end
+
+        it { expect(new_frame.frame_over?).to eq true }
+      end
+
+      context 'when we bowl a non strike first bowl' do
+        before { new_frame.register_bowl first_non_strike_non_spare_roll }
+
+        it { expect(new_frame.frame_over?).to eq false }
+      end
+
+      context 'when we bowl two non spare bowls' do
+        before do
+          new_frame.register_bowl first_non_strike_non_spare_roll
+          new_frame.register_bowl second_non_strike_non_spare_roll
+        end
+
+        it { expect(new_frame.frame_over?).to eq true }
+      end
+
+      context 'when we bowl a spare' do
+        before do
+          new_frame.register_bowl random_non_zero_non_strike_roll
+          new_frame.register_bowl spare_roll
+        end
+
+        it { expect(new_frame.frame_over?).to eq false }
+      end
+
+      context 'when we have scored 1 bonus bowl from a spare frame' do
+        before do
+          new_frame.register_bowl random_non_zero_non_strike_roll
+          new_frame.register_bowl spare_roll
+          new_frame.score_bonus random_non_zero_bowl
+        end
+
+        it { expect(new_frame.frame_over?).to eq true }
+      end
+    end
+
+  end
+
 end
