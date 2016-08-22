@@ -7,7 +7,6 @@ module TenPin
 
     MAX_FRAME_SCORE = 10
     MIN_FRAME_SCORE = 0
-    STRIKE_INDEX = 0
     STRIKE_BOWL = 1
     SPARE_BOWLS = 2
     STRIKE_BONUS_BOWLS = 2
@@ -21,6 +20,12 @@ module TenPin
 
     def score
       frame_score + bonus_score
+    end
+
+    def frame_over?
+      strike_bonus_scored? ||
+      spare_bonus_scored? ||
+      two_bowls_completed_no_bonus?
     end
 
     def frame_score
@@ -37,12 +42,6 @@ module TenPin
 
     def no_bonus_mode?
       !bonus_mode?
-    end
-
-    def frame_over?
-      strike_bonus_scored? ||
-        spare_bonus_scored? ||
-        two_bowls_completed_no_bonus?
     end
 
     def register_bowl(bowl)
@@ -65,7 +64,7 @@ module TenPin
     def valid_frame_bowl?(bowl)
       bowl <= available_score_left &&
         bowled_pins_between_zero_and_ten?(bowl) &&
-        @bowls.size < 2
+        @bowls.size < MAX_FRAME_BOWLS
     end
 
     def available_score_left
@@ -73,7 +72,8 @@ module TenPin
     end
 
     def bowled_pins_between_zero_and_ten?(bowl)
-      bowl.is_a?(Integer) && bowl >= MIN_FRAME_SCORE && bowl <= MAX_FRAME_SCORE
+      bowl >= MIN_FRAME_SCORE &&
+        bowl <= MAX_FRAME_SCORE
     end
 
     def strike?
@@ -104,9 +104,10 @@ module TenPin
       spare? && @bonus_bowls.size == SPARE_BONUS_BOWLS
     end
 
+    private :frame_score, :bonus_score, :no_bonus_mode?, :max_frame_scored?
     private :valid_bowl?, :bowled_pins_between_zero_and_ten?
-    private :valid_frame_bowl?, :available_score_left, :strike?
-    private :spare_bonus_scored?, :bonus_scored?, :strike_bonus_scored?
-    private :frame_score, :bonus_score
+    private :valid_frame_bowl?, :available_score_left, :strike?, :spare?
+    private :spare_bonus_scored?, :strike_bonus_scored?, :bonus_scored?
+    private :two_bowls_completed_no_bonus?
   end
 end

@@ -15,16 +15,6 @@ describe TenPin::Frame do
   let(:first_non_strike_non_spare_roll) { 2 }
   let(:second_non_strike_non_spare_roll) { 3 }
   let(:gutter_ball) { 0 }
-  # let(:non_strike_non_spare_result) do
-  #   first_non_strike_non_spare_roll + second_non_strike_non_spare_roll
-  # end
-  # let(:score_plus_random_non_zero_bowl) { strike + random_non_zero_bowl }
-  # let(:score_plus_two_random_non_zero_bowl) do
-  #   strike + first_non_strike_non_spare_roll +
-  #     second_non_strike_non_spare_roll
-  # end
-  # let(:spare_score) { 10 }
-  # let(:spare_plus_bonus_roll_score) { spare_score + random_non_zero_bowl }
 
   describe '#register_bowl' do
 
@@ -88,7 +78,7 @@ describe TenPin::Frame do
   describe '#score' do
 
     context 'Given a new frame' do
-      it { expect(new_frame.score).to eq 0 }
+      it { expect(new_frame.score).to eq new_game_score }
 
       context 'when we roll a valid first roll' do
         before { new_frame.register_bowl random_non_zero_bowl }
