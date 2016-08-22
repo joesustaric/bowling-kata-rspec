@@ -14,7 +14,7 @@ describe TenPin::Frame do
   let(:spare_roll) { strike - random_non_zero_non_strike_roll }
   let(:first_non_strike_non_spare_roll) { 2 }
   let(:second_non_strike_non_spare_roll) { 3 }
-  # let(:gutter_ball) { 0 }
+  let(:gutter_ball) { 0 }
   # let(:non_strike_non_spare_result) do
   #   first_non_strike_non_spare_roll + second_non_strike_non_spare_roll
   # end
@@ -133,6 +133,27 @@ describe TenPin::Frame do
           expect(new_frame.score).to eq score
         end
       end
+
+      context 'when we roll the worst frame ever (two 0 bowls)' do
+        let(:worst_frame_score) { 0 }
+        before do
+          new_frame.register_bowl gutter_ball
+          new_frame.register_bowl gutter_ball
+        end
+
+        it { expect(new_frame.score).to eq worst_frame_score }
+      end
+
+      context 'when we bowl best frame ever (strike + 2 bonus strike bowls)' do
+        let(:best_frame_score) { 30 }
+        before do
+          new_frame.register_bowl strike
+          new_frame.score_bonus strike
+          new_frame.score_bonus strike
+        end
+
+        it { expect(new_frame.score).to eq best_frame_score }
+      end
     end
 
     context 'Given a strike frame' do
@@ -181,5 +202,6 @@ describe TenPin::Frame do
         end
       end
     end
+
   end
 end
