@@ -24,8 +24,16 @@ module TenPin
 
     def frame_over?
       strike_bonus_scored? ||
-      spare_bonus_scored? ||
-      two_bowls_completed_no_bonus?
+        spare_bonus_scored? ||
+        two_bowls_completed_no_bonus?
+    end
+
+    def frame_not_over?
+      !frame_over?
+    end
+
+    def regular_bowls_complete?
+      strike? || spare? || two_bowls_completed?
     end
 
     def frame_score
@@ -84,8 +92,12 @@ module TenPin
       @bowls.size == SPARE_BOWLS && max_frame_scored?
     end
 
+    def two_bowls_completed?
+      @bowls.size == MAX_FRAME_BOWLS
+    end
+
     def two_bowls_completed_no_bonus?
-      @bowls.size == MAX_FRAME_BOWLS && no_bonus_mode?
+      two_bowls_completed? && no_bonus_mode?
     end
 
     def max_frame_scored?

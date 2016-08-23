@@ -264,4 +264,42 @@ describe TenPin::Frame do
 
   end
 
+  describe '#regular_bowls_complete?' do
+
+    context 'Given a new frame' do
+      it { expect(new_frame.regular_bowls_complete?).to eq false }
+
+      context 'when we bowl a strike frame' do
+        before { new_frame.register_bowl strike }
+
+        it { expect(new_frame.regular_bowls_complete?).to eq true }
+      end
+
+      context 'when we bowl a spare frame' do
+        before do
+          new_frame.register_bowl random_non_zero_non_strike_roll
+          new_frame.register_bowl spare_roll
+        end
+
+        it { expect(new_frame.regular_bowls_complete?).to eq true }
+      end
+
+      context 'when the first bowl is not a strike' do
+        before { new_frame.register_bowl random_non_zero_non_strike_roll }
+
+        it { expect(new_frame.regular_bowls_complete?).to eq false }
+      end
+
+      context 'when we have bowled two balls and no strike or spare is hit' do
+        before do
+          new_frame.register_bowl first_non_strike_non_spare_roll
+          new_frame.register_bowl second_non_strike_non_spare_roll
+        end
+
+        it { expect(new_frame.regular_bowls_complete?).to eq true }
+      end
+
+    end
+  end
+
 end
