@@ -16,15 +16,6 @@ describe TenPin::Frame do
   let(:second_non_strike_non_spare_roll) { 3 }
   let(:gutter_ball) { 0 }
 
-  # describe '#normal_mode?' do
-  #   context 'Given a new frame' do
-  #     it { expect(new_frame.normal_mode?).eq to true}
-  #
-  #     context ' when we bowl a'
-  #   end
-  #
-  # end
-
   describe '#register_bowl' do
 
     context 'Given a new game' do
