@@ -48,9 +48,7 @@ module TenPin
     end
 
     def add_bowl_to_any_bonus_frames(bowl)
-      @frames.each do |f|
-        f.score_bonus bowl
-      end
+      @frames.each { |f| f.score_bonus bowl }
     end
   end
 end

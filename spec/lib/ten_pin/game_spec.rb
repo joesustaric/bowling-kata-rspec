@@ -63,4 +63,24 @@ describe TenPin::Game do
     end
   end
 
+  describe '#game_over?' do
+    context 'Given a new game' do
+      it { expect(new_game.game_over?).to eq false }
+
+      context 'when we complete a game' do
+        let(:perfect_game) { [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10] }
+        let(:perfect_game_score) { 300 }
+        before { perfect_game.each { |bowl| new_game.bowl_ball bowl } }
+
+        it { expect(new_game.game_over?).to eq true }
+      end
+
+      context 'when we are mid game' do
+        before { new_game.bowl_ball 5 }
+
+        it { expect(new_game.game_over?).to eq false }
+      end
+    end
+  end
+
 end

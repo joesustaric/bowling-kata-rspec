@@ -22,8 +22,7 @@ module TenPin
     end
 
     def frame_over?
-      bonus_scored? ||
-        two_bowls_completed_no_bonus?
+      bonus_scored? || two_bowls_completed_no_bonus?
     end
 
     def frame_not_over?
@@ -85,6 +84,10 @@ module TenPin
       false
     end
 
+    def bonus_scored?
+      bonus_mode? && @bowls.size == BONUS_BOWLS
+    end
+
     def sum_first_two_bowls
       @bowls[FIRST_BOWL] + @bowls[SECOND_BOWL]
     end
@@ -101,17 +104,9 @@ module TenPin
       bowled_at_least_twice? && no_bonus_mode?
     end
 
-    def max_frame_scored?
-      score == MAX_FRAME_SCORE
-    end
-
-    def bonus_scored?
-      bonus_mode? && @bowls.size == BONUS_BOWLS
-    end
-
-    private :no_bonus_mode?, :max_frame_scored?, :sum_first_two_bowls
-    private :valid_bowl?, :bowled_pins_between_zero_and_ten?
-    private :valid_frame_bowl?, :available_score_left, :strike?, :spare?
-    private :bonus_scored?, :two_bowls_completed_no_bonus?
+    private :no_bonus_mode?, :sum_first_two_bowls, :spare?, :bonus_scored?
+    private :valid_bowl?, :bowled_pins_between_zero_and_ten?, :strike?
+    private :valid_frame_bowl?, :available_score_left
+    private :two_bowls_completed_no_bonus?
   end
 end
