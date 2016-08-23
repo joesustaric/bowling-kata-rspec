@@ -59,6 +59,7 @@ module TenPin
     end
 
     def score_bonus(bowl)
+      return false unless bowl.is_a?(Integer)
       return false unless bowled_pins_between_zero_and_ten? bowl
       return false unless bonus_mode?
       @bonus_bowls << bowl unless bonus_scored?
