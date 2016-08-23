@@ -29,11 +29,19 @@ describe TenPin::Game do
       end
 
       context 'when we bowl a game with no strikes or spares' do
+        let(:game_bowls) { [2, 3, 1, 2, 6, 0, 9, 0, 1, 0, 0, 0, 3, 3, 4, 4, 2, 2, 1, 8] }
+        let(:game_score) { game_bowls.inject(0, :+) }
+        before { game_bowls.each { |bowl| new_game.bowl_ball bowl } }
 
+        it { expect(new_game.score).to eq game_score }
       end
 
       context 'when we bowl a game with all spares' do
+        let(:game_bowls) { [7, 3, 5, 5, 9, 1, 2, 8, 4, 6, 6, 4, 3, 7, 1, 9, 9, 1, 9, 1, 10] }
+        let(:game_score) { 158 }
+        before { game_bowls.each { |bowl| new_game.bowl_ball bowl } }
 
+        it { expect(new_game.score).to eq game_score }
       end
 
       context 'when we bowl a game with mixed spares and strikes' do

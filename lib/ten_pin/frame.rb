@@ -33,7 +33,7 @@ module TenPin
     end
 
     def regular_bowls_complete?
-      strike? || spare? || two_bowls_completed?
+      strike? || two_bowls_completed?
     end
 
     def frame_score

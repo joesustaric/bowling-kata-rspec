@@ -3,6 +3,8 @@ require 'ten_pin/game'
 module TenPin
   # Class Comment TODO
   class Game
+    attr_accessor :frames, :frame_in_play
+
     START_FRAME_INDEX = 0
     MAX_FRAMES_PER_GAME = 10
     NEXT_INDEX = 1
@@ -16,9 +18,9 @@ module TenPin
 
     def bowl_ball(bowl)
       unless game_over?
-        @frame_in_play.register_bowl bowl
         add_bowl_to_any_bonus_frames bowl
         move_to_next_frame if @frame_in_play.regular_bowls_complete?
+        @frame_in_play.register_bowl bowl
       end
     end
 
@@ -28,6 +30,10 @@ module TenPin
 
     def last_frame?
       @frame_in_play.equal? @frames.last
+    end
+
+    def current_frame?(frame)
+      @frame_in_play.equal? frame
     end
 
     def game_over?
@@ -42,7 +48,9 @@ module TenPin
     end
 
     def add_bowl_to_any_bonus_frames(bowl)
-      @frames.each { |f| f.score_bonus bowl }
+      @frames.each do |f|
+        f.score_bonus bowl
+      end
     end
   end
 end
