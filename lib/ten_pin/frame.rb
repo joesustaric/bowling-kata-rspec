@@ -10,6 +10,7 @@ module TenPin
     FIRST_BOWL = 0
     SECOND_BOWL = 1
     BONUS_BOWLS = 3
+    ONE_BOWL = 1
     TWO_BOWLS = 2
 
     def initialize
@@ -30,7 +31,7 @@ module TenPin
     end
 
     def regular_bowls_complete?
-      strike? || two_bowls_completed?
+      strike? || bowled_at_least_twice?
     end
 
     def bonus_mode?
@@ -63,8 +64,7 @@ module TenPin
     end
 
     def valid_frame_bowl?(bowl)
-      bowl <= available_score_left &&
-        bowled_pins_between_zero_and_ten?(bowl)
+      bowl <= available_score_left && bowled_pins_between_zero_and_ten?(bowl)
     end
 
     def available_score_left
@@ -76,22 +76,29 @@ module TenPin
     end
 
     def strike?
-      return true if @bowls.size >= 1 && @bowls[FIRST_BOWL] == MAX_FRAME_SCORE
+      return @bowls[FIRST_BOWL] == MAX_FRAME_SCORE if bowled_at_least_once?
       false
     end
 
     def spare?
-      return true if @bowls.size >= 2 &&
-                     @bowls[FIRST_BOWL] + @bowls[SECOND_BOWL] == MAX_FRAME_SCORE
+      return sum_first_two_bowls == MAX_FRAME_SCORE if bowled_at_least_twice?
       false
     end
 
-    def two_bowls_completed?
+    def sum_first_two_bowls
+      @bowls[FIRST_BOWL] + @bowls[SECOND_BOWL]
+    end
+
+    def bowled_at_least_once?
+      @bowls.size >= ONE_BOWL
+    end
+
+    def bowled_at_least_twice?
       @bowls.size >= TWO_BOWLS
     end
 
     def two_bowls_completed_no_bonus?
-      two_bowls_completed? && no_bonus_mode?
+      bowled_at_least_twice? && no_bonus_mode?
     end
 
     def max_frame_scored?
@@ -102,7 +109,7 @@ module TenPin
       bonus_mode? && @bowls.size == BONUS_BOWLS
     end
 
-    private :no_bonus_mode?, :max_frame_scored?
+    private :no_bonus_mode?, :max_frame_scored?, :sum_first_two_bowls
     private :valid_bowl?, :bowled_pins_between_zero_and_ten?
     private :valid_frame_bowl?, :available_score_left, :strike?, :spare?
     private :bonus_scored?, :two_bowls_completed_no_bonus?
